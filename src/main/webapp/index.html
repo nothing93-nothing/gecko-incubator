@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gecko Incubator Learning Tool</title>
+    <style>
+        /* Base Reset and Accessible Fonts */
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.5s ease; /* Smooth background color transition */
+            background-color: #e0f7fa; /* Default Cold */
+        }
+
+        /* Main Container */
+        .app-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        p.instruction {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+
+        /* Gecko Image Display Area */
+        .gecko-display-area {
+            width: 100%;
+            height: 300px;
+            border-radius: 15px;
+            border: 4px dashed #ccc;
+            margin: 20px 0;
+            display: flex;
+            justify-content: left;
+            align-items: end;
+            position: relative;
+            overflow: hidden;
+            background-color: #f9f9f9;
+
+            background-image: url('photo/tank.png');
+            background-size: cover; /* This makes the image fill the whole box */
+            background-position: center;
+        }
+
+        .gecko-image {
+            max-width: 50%;
+            max-height: 50%;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Large Status Label for Clear Feedback */
+        .status-badge {
+            display: inline-block;
+            padding: 10px 25px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Control Section */
+        .control-panel {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .temperature-readout {
+            font-size: 42px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 15px;
+        }
+
+        /* Accessible, Large Slider */
+        .slider-container {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .temp-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 25px;
+            border-radius: 15px;
+            background: linear-gradient(to right, #81d4fa, #a5d6a7, #ffab91, #ef5350);
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Making the slider knob large and easy to grab for SEN students */
+        .temp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 4px solid #333;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+
+        .temp-slider::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>守宮的家</h1>
+    <p class="instruction">調校溫度，幫助守宮擁有舒適的溫度生活吧！</p>
+
+    <div class="gecko-display-area" id="geckoDisplay">
+        <img id="geckoImg" class="gecko-image" src="https://via.placeholder.com/300x250?text=Gecko+Image" alt="Gecko Condition">
+    </div>
+
+    <div id="statusBadge" class="status-badge">Loading...</div>
+
+    <div class="control-panel">
+        <div class="temperature-readout"><span id="tempValue">0</span>°C</div>
+        <div class="slider-container">
+            <input type="range" min="0" max="60" value="15" class="temp-slider" id="tempSlider">
+        </div>
+    </div>
+</div>
+
+<script>
+    const slider = document.getElementById('tempSlider');
+    const tempValue = document.getElementById('tempValue');
+    const statusBadge = document.getElementById('statusBadge');
+    const geckoImg = document.getElementById('geckoImg');
+    const bodyBg = document.body;
+
+    function updateIncubator(temp) {
+        // Update the temperature text display
+        tempValue.textContent = temp;
+
+        // State logic based on your temperature brackets
+        if (temp >= 0 && temp <= 30) {
+            // --- COLD STATE ---
+            statusBadge.textContent = "❄️ 太冷了！";
+            statusBadge.style.backgroundColor = "#b3e5fc";
+            statusBadge.style.color = "#01579b";
+            bodyBg.style.backgroundColor = "#e0f7fa"; // Light Blue Background
+
+            // INJECT COLD GECKO IMAGE HERE:
+            geckoImg.src = "photo/cold-r.png";
+            geckoImg.alt = "The gecko looks cold and sluggish.";
+
+        } else if (temp >= 32 && temp <= 36) {
+            // --- WARM / GOOD STATE ---
+            statusBadge.textContent = "💖 完美！";
+            statusBadge.style.backgroundColor = "#c8e6c9";
+            statusBadge.style.color = "#1b5e20";
+            bodyBg.style.backgroundColor = "#e8f5e9"; // Light Green Background
+
+            // INJECT HAPPY/WARM GECKO IMAGE HERE:
+            geckoImg.src = "photo/good-r.png";
+            geckoImg.alt = "The gecko is happy and healthy!";
+
+        } else if (temp >= 40 && temp <= 50) {
+            // --- HOT STATE ---
+            statusBadge.textContent = "🔥 太熱了！";
+            statusBadge.style.backgroundColor = "#ffcc80";
+            statusBadge.style.color = "#e65100";
+            bodyBg.style.backgroundColor = "#fff3e0"; // Light Orange Background
+
+            // INJECT HOT GECKO IMAGE HERE:
+            geckoImg.src = "photo/hot-r.png";
+            geckoImg.alt = "The gecko is overheating!";
+
+        } else if (temp > 50) {
+            // --- DEAD STATE ---
+            statusBadge.textContent = "💀 Oh no! 死了...";
+            statusBadge.style.backgroundColor = "#cfd8dc";
+            statusBadge.style.color = "#37474f";
+            bodyBg.style.backgroundColor = "#eceff1"; // Dull Grey Background
+
+            // INJECT DEAD GECKO IMAGE HERE:
+            geckoImg.src = "photo/dead-r.png";
+            geckoImg.alt = "The incubator got too hot. The gecko didn't survive.";
+
+        } else {
+            // --- TRANSITION STATES (e.g., 31°C or 37-39°C) ---
+            // Provides smooth warning zones so states don't abruptly snap
+            statusBadge.textContent = "⚠️ 溫度改變中...";
+            statusBadge.style.backgroundColor = "#fff9c4";
+            statusBadge.style.color = "#f57f17";
+            bodyBg.style.backgroundColor = "#fffde7";
+
+            // INJECT TRANSITION GECKO IMAGE HERE:
+            geckoImg.src = "https://via.placeholder.com/300x250/fff9c4/f57f17?text=Uncomfortable+Gecko";
+            geckoImg.alt = "The temperature is changing.";
+        }
+    }
+
+    // Listen for slider movements
+    slider.addEventListener('input', (e) => {
+        updateIncubator(e.target.value);
+    });
+
+    // Initialize on page load
+    updateIncubator(slider.value);
+</script>
+</body>
+</html>
